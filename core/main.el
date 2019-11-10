@@ -1,3 +1,6 @@
+(require 'package)
+(require 'ui)
+
 (defvar emacs-dir (file-truename user-emacs-directory))
 (defvar core-dir (concat emacs-dir "core/"))
 (defvar modules-dir (concat emacs-dir "modules/"))
@@ -21,11 +24,9 @@
  tramp-backup-directory-alist backup-directory-alist
  tramp-persistency-file-name  (concat cache-dir "tramp-persistency.el"))
 
-(defun initialize ()
-  (add-to-list 'load-path core-dir)
-  (require 'ui)
-  (require 'packages))
-
-(initialize)
+(defun init ()
+  (init-ui)
+  (init-modules)
+  (init-packages))
 
 (provide 'main)
