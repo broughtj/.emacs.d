@@ -1,3 +1,5 @@
+(defvar init-packages-p nil)
+
 (defvar package-list () "A list of enabled packages.")
 
 (defun package (name &rest)
