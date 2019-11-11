@@ -1,16 +1,16 @@
 (defvar init-packages-p nil)
 
-(defvar package-list () "A list of enabled packages.")
+(defvar package-list ())
 
 (defun package (name &rest)
   (push name package-list))
 
 (defun ensure-straight ()
   (defvar boostrap-version)
-  (let* ((user-emacs-directory straigt-base-dir)
-	 (bootstrap-file (path straight-base-dir "straight/repos/straight.el/straight.el"))
+  (let* ((user-emacs-directory local-dir)
+	 (bootstrap-file (concat local-dir "straight/repos/straight.el/straight.el"))
 	 (bootstrap-version 5))
-    (make-directory (path straight-base-dir "straight/build") 'parents)
+    (make-directory (concat local-dir "straight/build") 'parents)
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
 	  (url-retrieve-synchronously

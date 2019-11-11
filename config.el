@@ -1,0 +1,6 @@
+(:editor
+ keybindings
+
+ :lang
+ clojure)
+ 
