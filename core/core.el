@@ -25,9 +25,13 @@
 
 (defun init (&optional force-p)
   (when (or force-p (not init-p))
-    (setq init-p t)
-    (require 'ui)
-    (require 'modules) (init-modules)
-    (require 'packages) (init-packages)))
+    (require 'ui (concat core-dir "ui"))
+    (require 'modules (concat core-dir "modules"))
+    (require 'packages (concat core-dir "packages"))
+
+    (init-modules)
+    (init-packages)
+
+    (setq init-p t)))
 
 (provide 'core)

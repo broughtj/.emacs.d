@@ -1,1 +1,1 @@
-(package cider)
+(package 'cider)

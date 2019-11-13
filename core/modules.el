@@ -1,37 +1,43 @@
+(require 'dash (concat core-dir "dash"))
+
 (defvar init-modules-p nil)
 
 (defvar module-list ())
 
-(defun load-config (&optional from)
-  (cl-reduce
-   (lambda (category thing)
-     (cond
-       ((keywordp thing) ; new category
-	(concat (name thing) "/"))
-       ((symbolp thing) ; new module
-	(push
-	 module-list
-	  '(:path (concat modules-dir category thing)
-	    :name thing)))
-	((listp thing) ; new module with options
-	 (let ((module-name (name (car thing)))
-	       (options (cdr thing)))
-	   (push
-	    module-list
-	    '(:path (concat modules-dir category module-name ".el")
-              :name module-name
-	      :options options))))))
-     (with-current-buffer (file-file-noselect (or from (concat emacs-dir "config.el")))
-       (goto-char (point-min))
-       (read (current-buffer)))))
-
+(defun load-modules (config)
+  (-reduce-from
+    (lambda (acc section)
+      (let ((category (concat (substring (symbol-name (car section)) 1) "/"))
+	    (modules (cdr section)))
+        (append 
+	  (-map
+	   (lambda (module)
+	     (if (listp module)
+	       (let ((name (car module))
+		     (options (cdr module)))
+	         (list :path (concat modules-dir category (symbol-name name))
+		       :name name
+		       :options options))
+	       (list :path (concat modules-dir category (symbol-name module))
+	       	     :name module)))
+	   modules)
+	  acc)))
+    '()
+    (-partition-by-header 'keywordp config)))
 
 (defun init-modules (&optional force-p)
   (when (or force-p (not init-modules-p))
-    (load-config)
-    (mapc
-     (lambda (m) (load (gethash :path m)))
-     module-list)
-    (setq init-modules-p t)))
+    (let* ((config (with-current-buffer (find-file-noselect (concat emacs-dir "config.el"))
+		    (goto-char (point-min))
+		    (read (current-buffer))))
+	   (loaded (load-modules config)))
+      (message "%s" loaded)
+      (setq module-list (load-modules config))
+      (-map 
+	(lambda (m)
+	  (message "%s" m)
+	  (load (plist-get m :path)))
+	loaded)
+      (setq init-modules-p t))))
 
 (provide 'modules)
